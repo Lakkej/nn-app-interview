@@ -1,10 +1,10 @@
 import { Button, TextField, Typography } from "@mui/material";
-import { SymbolsSelect } from "../SymbolsSelect";
 import { useState } from "react";
-import { useConvert } from "../../hooks";
+import { useApi } from "../../hooks";
+import { FromToSelect } from "../common";
 
 type ExchangeProps = {
-  symbols: { [key: string]: string } | undefined;
+  symbols: { [key: string]: string };
 };
 
 export const Exchange = ({ symbols }: ExchangeProps) => {
@@ -15,40 +15,55 @@ export const Exchange = ({ symbols }: ExchangeProps) => {
     undefined
   );
 
-  const { convert } = useConvert();
+  const { convert } = useApi();
 
-    const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+  const onSubmit = async (
+    event: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => {
     event.preventDefault();
     const convertedAmount = await convert(from, to, amount);
     setConvertedAmount(convertedAmount);
+  };
 
   const onAmountChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setAmount(Number(event.target.value));
   };
 
-  if (symbols === undefined) {
-    return <div>Loading Symbols...</div>;
-  }
-
   return (
-    <form>
-      <SymbolsSelect symbols={symbols} symbol={to} setSymbol={setTo} />
-      <SymbolsSelect symbols={symbols} symbol={from} setSymbol={setFrom} />
+    <form className="form">
+      <FromToSelect
+        symbols={symbols}
+        setFrom={setFrom}
+        setTo={setTo}
+        from={from}
+        to={to}
+      />
       <TextField
+        sx={{ width: "250px" }}
         id="outlined-basic"
         label="Amount"
         variant="outlined"
+        type="number"
+        inputProps={{
+          min: 0,
+        }}
         value={amount}
         onChange={onAmountChange}
       />
-      <Button variant="contained" onClick={}>
+      <Button
+        variant="contained"
+        onClick={onSubmit}
+        sx={{
+          width: "250px",
+        }}
+      >
         Submit
       </Button>
 
-      <Typography>
+      <Typography height={"20px"}>
         {convertedAmount === undefined
           ? ""
-          : `Convert ${amount} ${from} to ${to} equals ${convertedAmount}`}
+          : `It is ${convertedAmount.toFixed(3)}`}
       </Typography>
     </form>
   );

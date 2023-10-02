@@ -1,18 +1,21 @@
-import React from "react";
-import logo from "./logo.svg";
 import "./App.css";
-import { Paper } from "@mui/material";
-import { Exchange } from "./components";
+import { Exchange, History, Rates, Tabs } from "./components";
 import { useSymbols } from "./hooks";
 
 function App() {
-  const { symbols } = useSymbols();
+  const symbols = useSymbols();
 
   return (
     <div className="App">
-      <Paper>
-        <Exchange symbols={symbols}/>
-      </Paper>
+      {symbols === undefined ? (
+        <div>Loading Symbols...</div>
+      ) : (
+        <Tabs
+          Exchange={<Exchange symbols={symbols} />}
+          History={<History symbols={symbols} />}
+          Rates={<Rates symbols={symbols} />}
+        />
+      )}
     </div>
   );
 }

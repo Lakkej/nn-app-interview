@@ -1,31 +1,32 @@
-import { useEffect, useMemo, useState } from "react";
-import { myHeaders } from "../consts";
+import { useEffect, useState } from "react";
+import { headers } from "../consts";
 
-export const useSymbols = () => {
-  const [symbols, setSymbols] = useState<
-    { [key: string]: string } | undefined
-  >();
-  const requestOptions: RequestInit = useMemo(
-    () => ({
-      method: "GET",
-      redirect: "follow",
-      headers: myHeaders,
-    }),
-    []
+const useSymbols = () => {
+  const [symbols, setSymbols] = useState<{ [key: string]: string } | undefined>(
+    undefined
   );
 
   useEffect(() => {
-    fetch("https://api.apilayer.com/exchangerates_data/symbols", requestOptions)
-      .then((response) => response.json())
-      .then((result) => {
-        if ("symbols" in result) {
+    const fetchSymbols = async () => {
+      try {
+        const response = await fetch(
+          "https://api.apilayer.com/exchangerates_data/symbols",
+          headers
+        );
+        const result = await response.json();
+
+        if (result.success) {
           setSymbols(result.symbols);
         }
-      })
-      .catch((error) => {
+      } catch (error) {
         console.log("error", error);
-      });
-  }, [requestOptions]);
+      }
+    };
 
-  return { symbols };
+    fetchSymbols();
+  }, []);
+
+  return symbols;
 };
+
+export { useSymbols };
